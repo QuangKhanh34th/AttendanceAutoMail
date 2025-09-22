@@ -21,27 +21,46 @@ class LoginViewModel : ViewModel() {
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
 
+    /*
+    User clicks "Sign in with Google" button
+    ↓
+    CredentialManager shows Google account picker
+    ↓
+    User selects account
+    ↓
+    Google returns a credential object
+    ↓
+    We convert it to GoogleIdTokenCredential
+    ↓
+    We extract the ID token for server authentication
+     */
     fun signInWithGoogle(activity: Activity) {
         viewModelScope.launch {
             try {
+                // 1. Set loading state
                 _loginState.value = LoginState.Loading
 
+                // 2. Initialize credential manager
                 val credentialManager = CredentialManager.create(activity)
 
+                // 3. Configure Google Sign-In options
                 val googleIdOption = GetGoogleIdOption.Builder()
-                    .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(SERVER_CLIENT_ID)
+                    .setFilterByAuthorizedAccounts(false) // Show all Google accounts, not just previously used ones
+                    .setServerClientId(SERVER_CLIENT_ID) // Server client ID so Google recognizes the app
                     .build()
 
+                // 4. Create credential request from the IdOption configured above
                 val request = GetCredentialRequest.Builder()
                     .addCredentialOption(googleIdOption)
                     .build()
 
+                // 5. Request credentials (Show Google's account picker and wait for user selection)
                 val response = credentialManager.getCredential(
                     request = request,
                     context = activity
                 )
 
+                // 6. Handle response
                 handleSignInResponse(response)
             } catch (e: GetCredentialException) {
                 Log.e("LoginViewModel", "Error signing in: ${e.message}")
@@ -52,8 +71,13 @@ class LoginViewModel : ViewModel() {
 
     private fun handleSignInResponse(response: GetCredentialResponse) {
         try {
+            // Get the credential data
             val credential = response.credential
+
+            // Convert it to a Google ID token
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+
+            // Get the actual token and email
             val googleIdToken = googleIdTokenCredential.idToken
 
             // Here you would typically send this token to your backend or use it to authenticate with Firebase
