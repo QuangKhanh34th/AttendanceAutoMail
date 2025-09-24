@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.attendanceautomail"
+    namespace = "com.comfysoft.attendanceautomail"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.attendanceautomail"
+        applicationId = "com.comfysoft.attendanceautomail"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
