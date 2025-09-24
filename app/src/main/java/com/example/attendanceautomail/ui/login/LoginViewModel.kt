@@ -93,7 +93,7 @@ class LoginViewModel : ViewModel() {
     }
 
     companion object {
-        // You'll need to replace this with your own server client ID from Google Cloud Console
+        // Server client ID from Google Cloud Console
         private const val SERVER_CLIENT_ID = "362212576102-1v5dg5ae5018d8131nrh2pdnsan66ee9.apps.googleusercontent.com"
     }
 }
